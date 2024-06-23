@@ -1,4 +1,4 @@
-// File: D:\PBL\semester4\iotsmartfarming\app\layout.js
+// File: D:\Semester 4\PBL\Aplikasi web dan arduino\iotsmartfarming\app\layout.js
 import * as entry from '../../../app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
