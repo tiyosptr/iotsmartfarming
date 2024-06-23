@@ -1,15 +1,13 @@
 "use client";
-import { useEffect, useState } from "react";
-import Link from 'next/link';
-import Head from 'next/head';
+import Link from "next/link";
+import Head from "next/head";
 
 export default function Home() {
-
-
   return (
-   <div>
-    <Head>
+    <div>
+      <Head>
         <title>Welcome</title>
+        <style>{`html { scroll-behavior: smooth; }`}</style>
       </Head>
 
       <div className="flex flex-col h-screen">
@@ -19,37 +17,46 @@ export default function Home() {
               <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-center">
                 <div className="hidden sm:ml-20 sm:block">
                   <div className="flex space-x-4">
-                    <Link href="/home">
+                    <Link href="#home">
                       <div>Home</div>
                     </Link>
-                    <Link href="/informasi">
+                    <Link href="#informasi">
                       <div>Informasi</div>
                     </Link>
-                    <Link href="/monitoring">
+                    <Link href="#monitoring">
                       <div>Monitoring</div>
                     </Link>
-                    <Link href="/contact">
+                    <Link href="#contact">
                       <div>Contact</div>
                     </Link>
                   </div>
                 </div>
               </div>
-              <div className="absolute inset-y-0 right-0 w-auto pr-2 sm:static sm:inset-auto sm:pr-0">
-                <Link href="auth/login">
-                  <div>Log in</div>
+              <div className="flex space-x-4 justify-end">
+                <Link
+                  href="auth/login"
+                  style={{ backgroundColor: "#D3F8C9" }}
+                  className="py-3 inline-flex rounded-2xl  text-black px-5 font-bold"
+                >
+                  Log in
                 </Link>
-              </div>
-              <div className="absolute inset-y-0 right-0 w-auto pr-2 sm:static sm:inset-auto sm:pr-0">
-                <Link href="auth/register">
-                  <div>Register</div>
+                <Link
+                  href="auth/register"
+                  style={{ backgroundColor: "#D3F8C9" }}
+                  className="py-3 inline-flex rounded-2xl text-black px-5 font-bold"
+                >
+                  Register
                 </Link>
-              </div>
+                </div>
             </div>
           </div>
         </nav>
 
         <div className="bg-white">
-          <div className="relative flex h-screen content-center items-center justify-center pt-16 pb-32">
+          <div
+            id="home"
+            className="relative flex h-screen content-center items-center justify-center pt-16 pb-32"
+          >
             <div className="absolute top-0 h-full w-full bg-[url('/img/kebun.png')] bg-cover bg-center" />
             <div className="absolute top-0 h-full w-full bg-cover bg-center" />
             <div className="max-w-8xl container relative mx-auto">
@@ -59,13 +66,15 @@ export default function Home() {
                     TANAM SAYURAN ANDA LAYAKNYA BERMAIN GAME
                   </h1>
                   <h1 className="text-lg font-medium text-white">
-                    Teknologi kami memungkinkan Anda untuk memantau tanaman secara langsung, sehingga meningkatkan produktivitas dan memaksimalkan panen dalam praktik pertanian terkini.
+                    Teknologi kami memungkinkan Anda untuk memantau tanaman
+                    secara langsung, sehingga meningkatkan produktivitas dan
+                    memaksimalkan panen dalam praktik pertanian terkini.
                   </h1>
                 </div>
               </div>
               <div className="flex justify-center w-full">
                 <button
-                  style={{ backgroundColor: '#D3F8C9' }}
+                  style={{ backgroundColor: "#D3F8C9" }}
                   className="py-3 inline-flex rounded-2xl text-black items-center px-7 font-bold"
                 >
                   Get Started
@@ -74,7 +83,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="mx-auto mt-24 md:w-5/12 lg:mt-0 mb-8">
+          <div id="informasi" className="mx-auto mt-24 md:w-5/12 lg:mt-0 mb-8">
             <div>
               <h2 className="text-center font-bold text-2xl mb-8">Informasi</h2>
             </div>
@@ -84,53 +93,75 @@ export default function Home() {
               </div>
               <div>
                 <p className="font-medium">
-                  Teknologi LoRa memungkinkan kita mengirim data dari sensor tanaman secara nirkabel ke stasiun pusat bahkan di daerah terpencil. Ini menghasilkan pemantauan yang akurat dan andal.
+                  Teknologi LoRa memungkinkan kita mengirim data dari sensor
+                  tanaman secara nirkabel ke stasiun pusat bahkan di daerah
+                  terpencil. Ini menghasilkan pemantauan yang akurat dan andal.
                 </p>
               </div>
             </div>
           </div>
-
-          <div className="mx-auto mt-24 md:w-5/12">
+          <div id="monitoring" className="mx-auto mt-24 md:w-5/12">
             <div className="flex flex-row-reverse">
               <div className="relative h-50">
                 <img src="/img/game.png" alt="Game Image" />
               </div>
               <div>
                 <p className="font-medium">
-                  Perangkat kami dilengkapi dengan sensor yang dapat mengukur kelembapan tanah, suhu udara, intensitas cahaya, dan kelembapan udara. Memungkinkan Anda membuat keputusan yang tepat untuk merawat tanaman Anda dengan optimal.
+                  Perangkat kami dilengkapi dengan sensor yang dapat mengukur
+                  kelembapan tanah, suhu udara, intensitas cahaya, dan
+                  kelembapan udara. Memungkinkan Anda membuat keputusan yang
+                  tepat untuk merawat tanaman Anda dengan optimal.
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="relative flex h-screen content-center items-center justify-center pt-16 pb-32">
+          <div
+            id="monitoring"
+            className="relative flex h-screen content-center items-center justify-center pt-16 pb-32"
+          >
             <div className="absolute top-0 h-full w-full bg-[url('/img/cabe.jpeg')] bg-cover bg-center" />
             <div className="absolute top-0 h-full w-full bg-cover bg-center" />
             <div className="max-w-8xl container relative mx-auto">
               <div className="flex items-center">
                 <div className="ml-auto mr-auto w-full text-center lg:w-8/12">
                   <div>
-                    <h2 className="text-center text-white font-bold text-2xl mb-40">Monitoring</h2>
+                    <h2 className="text-center text-white font-bold text-2xl mb-40">
+                      Monitoring
+                    </h2>
                   </div>
                   <h1 className="text-2xl font-medium text-white leading-relaxed mb-6">
-                    Cabe Atau Cabai merupakan salah satu jenis tanaman dari keluarga Solanaceae tanaman kentang-kentungan. Tanaman cabe memiliki daun hijau dan buah yang umumnya berwarna hijau, merah, kuning, atau ungu, tergantung pada varietasnya. Cabe memiliki rasa pedas karena kandungan senyawa capsaicin yang terdapat di dalamnya. Cabe digunakan sebagai bumbu dapur dan bahan tambahan dalam berbagai hidangan untuk memberikan cita rasa pedas.
+                    Cabe Atau Cabai merupakan salah satu jenis tanaman dari
+                    keluarga Solanaceae tanaman kentang-kentungan. Tanaman cabe
+                    memiliki daun hijau dan buah yang umumnya berwarna hijau,
+                    merah, kuning, atau ungu, tergantung pada varietasnya. Cabe
+                    memiliki rasa pedas karena kandungan senyawa capsaicin yang
+                    terdapat di dalamnya. Cabe digunakan sebagai bumbu dapur dan
+                    bahan tambahan dalam berbagai hidangan untuk memberikan cita
+                    rasa pedas.
                   </h1>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="mx-auto w-full mt-12 lg:w-5/12">
+          <div id="contact" className="mx-auto w-full mt-12 lg:w-5/12">
             <div>
-              <h2 className="text-center text-black font-bold text-2xl mb-8">Our Contact</h2>
+              <h2 className="text-center text-black font-bold text-2xl mb-8">
+                Our Contact
+              </h2>
             </div>
             <form className="max-w-lg">
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">Nama</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Nama
+                </label>
                 <input className="mt-3 p-2 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" />
               </div>
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">Email</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Email
+                </label>
                 <input className="mt-3 p-2 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" />
               </div>
               <div className="mb-4">
@@ -144,10 +175,12 @@ export default function Home() {
           </div>
 
           <footer className="bg-black text-center py-4">
-            <p className="text-white text-sm">TILIKEBON. All rights reserved &copy;2024</p>
+            <p className="text-white text-sm">
+              TILIKEBON. All rights reserved &copy;2024
+            </p>
           </footer>
         </div>
       </div>
-   </div>
+    </div>
   );
 }
