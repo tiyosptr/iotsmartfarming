@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faB, faBaby, faBell, faBellConcierge, faBellSlash } from "@fortawesome/free-solid-svg-icons";
+//import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+//import { faB, faBaby, faBell, faBellConcierge, faBellSlash } from "@fortawesome/free-solid-svg-icons";
 import ApplicationLogo from "@/components/ApplicationLogo";
 import Dropdown from "@/components/Dropdown";
 import NavLink from "@/components/NavLink";
 import ResponsiveNavLink from "@/components/ResponsiveNavLink";
 
-import { Link } from "@inertiajs/react";
+import Link from "next/link";
 
 export default function Authenticated({ user, header, children }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
@@ -29,15 +29,15 @@ export default function Authenticated({ user, header, children }) {
                         </div>
                         <div className="space-x-5 text-white sm:-my-px sm:ml-5 sm:flex text-center">
                             <NavLink
-                                href={route("dashboard")}
-                                active={route().current("dashboard")}
+                                // href={route("dashboard")}
+                                //active={route().current("dashboard")}
                             >
                                 Dashboard
                             </NavLink>
 
                             <NavLink
-                                href={route("editprofile")}
-                                active={route().current("editprofile")}
+                              //  href={route("editprofile")}
+                                //active={route().current("editprofile")}
                             >
                                 Profile
                             </NavLink>
@@ -46,7 +46,7 @@ export default function Authenticated({ user, header, children }) {
                         <div className="flex items-center">
                             {/* Icon notification */}
                             <div className="relative">
-                                <FontAwesomeIcon
+                            <FontAwesomeIcon
                                     icon={faBell}
                                     className="text-black cursor-pointe\"
                                     onClick={() =>
@@ -57,14 +57,15 @@ export default function Authenticated({ user, header, children }) {
                                 />
                                 <span className="absolute top-0 right-0 h-2 w-2  rounded-full"></span>
                             </div>
+                            
 
                             <div
                                 style={{ backgroundColor: "#D3F8C9" }}
                                 className="py-3 rounded-2xl text-black bg-green-300 px-4 ml-2"
                             >
                                 <NavLink
-                                    href={route("logout")}
-                                    active={route().current("logout")}
+                                  //  href={route("logout")}
+                                  //  active={route().current("logout")}
                                     method="post"
                                     as="button"
                                 >
@@ -83,8 +84,8 @@ export default function Authenticated({ user, header, children }) {
                 >
                     <div className="pt-2 pb-3 space-y-1">
                         <ResponsiveNavLink
-                            href={route("dashboard")}
-                            active={route().current("dashboard")}
+                         //   href={route("dashboard")}
+                           // active={route().current("dashboard")}
                         >
                             Dashboard
                         </ResponsiveNavLink>

@@ -1,6 +1,6 @@
 import { useState, createContext, useContext, Fragment } from 'react';
-import { Link } from '@inertiajs/react';
-import { Transition } from '@headlessui/react';
+import Link from 'next/link';
+//import { Transition } from '@headlessui/react';
 
 const DropDownContext = createContext();
 

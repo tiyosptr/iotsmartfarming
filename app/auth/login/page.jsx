@@ -1,5 +1,12 @@
 "use client";
-import { useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
+import { Metadata } from "next";
+import FirebaseConfig from "@/components/FirebaseConfig/FirebaseConfig";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import Checkbox from "@/components/Checkbox";
 import GuestLayout from "../../Layouts/GuestLayout";
 import InputError from "../../../components/InputError";
@@ -8,7 +15,39 @@ import PrimaryButton from "../../../components/PrimaryButton";
 import TextInput from "../../../components/TextInput";
 
 export default function Login({ status, canResetPassword }) {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState(null);
+    const router = useRouter();
 
+    const handleSignIn = async () => {
+        try {
+          const auth = FirebaseConfig().auth;
+    
+          if (!email || !password) {
+            setError("Harap isi email dan password");
+            return;
+          }
+    
+          if (password.length < 8) {
+            setError("Password minimal 8 karakter");
+            return;
+          }
+          const userCredential = await signInWithEmailAndPassword(
+            auth,
+            email,
+            password
+          );
+          const user = userCredential.user;
+          console.log("User signed in:", user.uid);
+          router.push("/auth/register");
+          // Redirect atau tindakan lain setelah berhasil masuk
+        } catch (error) {
+          console.error("Error signing in:", error);
+          setError("Invalid email or password");
+        }
+      };
+    
 
     return (
         <GuestLayout>
@@ -18,14 +57,13 @@ export default function Login({ status, canResetPassword }) {
                     <InputLabel htmlFor="email" value="Email" />
 
                     <TextInput
-                        id="email"
                         type="email"
                         name="email"
-                       // value={data.email}
+                        value={email}
                         className="mt-1 block w-full"
-                        //autoComplete="username"
-                        //isFocused={true}
-                        //onChange={(e) => setData("email", e.target.value)}
+                        autoComplete="username"
+                        isFocused={true}
+                        onChange={(e) => setEmail(e.target.value)}
                     />
 
                      {/*  <InputError message={errors.email} className="mt-2" /> */}
@@ -35,13 +73,12 @@ export default function Login({ status, canResetPassword }) {
                     <InputLabel htmlFor="password" value="Password" />
 
                     <TextInput
-                        id="password"
                         type="password"
                         name="password"
-                       // value={data.password}
+                        value={password}
                         className="mt-1 block w-full"
-                        //autoComplete="current-password"
-                        //onChange={(e) => setData("password", e.target.value)}
+                        autoComplete="current-password"
+                        onChange={(e) => setPassword(e.target.value)}
                     />
 
                   {/*  <InputError message={errors.password} className="mt-2" /> */}
@@ -71,9 +108,10 @@ export default function Login({ status, canResetPassword }) {
                     <PrimaryButton
                         style={{ backgroundColor: "#D3F8C9" }}
                         className="mb-5 font-bold"
-                       //disabled={processing}
+                        onClick={handleSignIn}
                     >
                         Log in
+                        
                     </PrimaryButton>
                 </div>
             </form>
