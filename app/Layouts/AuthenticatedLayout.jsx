@@ -1,6 +1,6 @@
 import { useState } from "react";
-//import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-//import { faB, faBaby, faBell, faBellConcierge, faBellSlash } from "@fortawesome/free-solid-svg-icons";
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import { faB, faBaby, faBell, faBellConcierge, faBellSlash } from "@fortawesome/free-solid-svg-icons";
 import ApplicationLogo from "@/components/ApplicationLogo";
 import Dropdown from "@/components/Dropdown";
 import NavLink from "@/components/NavLink";
@@ -22,7 +22,7 @@ export default function Authenticated({ user, header, children }) {
                     <div className="flex h-16 items-center justify-between">
                         <div className="flex items-center">
                             <div className="flex-shrink-0">
-                                <Link href="/">
+                                <Link>
                                     {/* <ApplicationLogo className="block h-9 w-auto fill-current t" /> */}
                                 </Link>
                             </div>
@@ -46,7 +46,7 @@ export default function Authenticated({ user, header, children }) {
                         <div className="flex items-center">
                             {/* Icon notification */}
                             <div className="relative">
-                            <FontAwesomeIcon
+                            {/* <FontAwesomeIcon
                                     icon={faBell}
                                     className="text-black cursor-pointe\"
                                     onClick={() =>
@@ -54,7 +54,7 @@ export default function Authenticated({ user, header, children }) {
                                             "Notifikasi:\nPenyiraman pada 12:00\nPenyiraman pada 10:00\nPenyiraman pada 08:00"
                                         )
                                     }
-                                />
+                                /> */}
                                 <span className="absolute top-0 right-0 h-2 w-2  rounded-full"></span>
                             </div>
                             
@@ -93,12 +93,12 @@ export default function Authenticated({ user, header, children }) {
 
                     <div className="pt-4 pb-1 border-t border-gray-200">
                         <div className="px-4">
-                            <div className="font-medium text-base text-gray-800">
+                            {/* <div className="font-medium text-base text-gray-800">
                                 {user.name}
                             </div>
                             <div className="font-medium text-sm text-gray-500">
                                 {user.email}
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>

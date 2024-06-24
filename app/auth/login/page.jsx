@@ -54,7 +54,7 @@ export default function Login({ status, canResetPassword }) {
 
             <form >
                 <div>
-                    <InputLabel htmlFor="email" value="Email" />
+                    {/* <InputLabel htmlFor="email" value="Email" /> */}
 
                     <TextInput
                         type="email"
@@ -66,7 +66,7 @@ export default function Login({ status, canResetPassword }) {
                         onChange={(e) => setEmail(e.target.value)}
                     />
 
-                     {/*  <InputError message={errors.email} className="mt-2" /> */}
+                      {/* <InputError message={errors.email} className="mt-2" /> */}
                 </div>
 
                 <div className="mt-4">
@@ -81,18 +81,18 @@ export default function Login({ status, canResetPassword }) {
                         onChange={(e) => setPassword(e.target.value)}
                     />
 
-                  {/*  <InputError message={errors.password} className="mt-2" /> */}
+                   {/* <InputError message={errors.password} className="mt-2" /> */}
                 </div>
 
                 <div className="block mt-4">
-                    {/* <label className="flex items-center">
-                        <Checkbox
+                    <label className="flex items-center">
+                        {/* <Checkbox
                             name="remember"
                             checked={data.remember}
                             onChange={(e) => setData('remember', e.target.checked)}
-                        />
+                        /> */}
                         <span className="ms-2 text-sm text-gray-600">Remember me</span>
-                    </label> */}
+                    </label>
                 </div>
 
                 <div className="flex items-center justify-end mt-4">
@@ -105,14 +105,13 @@ export default function Login({ status, canResetPassword }) {
                         </Link>
                     )} */}
 
-                    <PrimaryButton
-                        style={{ backgroundColor: "#D3F8C9" }}
-                        className="mb-5 font-bold"
-                        onClick={handleSignIn}
-                    >
-                        Log in
-                        
-                    </PrimaryButton>
+<Link
+                  href="/dashboard"
+                  style={{ backgroundColor: "#D3F8C9" }}
+                  className="py-3 inline-flex rounded-2xl text-black px-5 font-bold"
+                >
+                  Login 
+                </Link>
                 </div>
             </form>
         </GuestLayout>

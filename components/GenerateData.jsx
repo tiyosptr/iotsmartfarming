@@ -1,5 +1,7 @@
 import React from "react";
 import NavLink from "@/components/NavLink";
+import Link from "next/link";
+
 
 function GeneratedData({ data, imageUrl }) {
     return (
@@ -95,12 +97,12 @@ function GeneratedData({ data, imageUrl }) {
                         style={{ backgroundColor: "#D3F8C9" }}
                         className="rounded-2xl py-2 px-7 text-black"
                     >
-                        <NavLink
-                            href={route("tabledata")}
+                        <Link
+                            href="/data"
                             className="text-black"
                         >
                             Lihat Perjam
-                        </NavLink>
+                        </Link>
                     </div>
                 </div>
             </div>

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import AuthenticatedLayout from "../Layouts/AuthenticatedLayout";
+// import AuthenticatedLayout from "../Layouts/AuthenticatedLayout";
 import ImageSelector from '../../components/ImageSelector';
 import GardenSizeSelector from "../../components/GardenSizeSelector";
 import RowCountSelector from "../../components/RowCountSelector";
@@ -8,6 +8,8 @@ import RowPlantSelector from "../../components/RowPlantSelector";
 import WateringTypeSelector from "../../components/WateringTypeSelector";
 import WateringIntervalSelector from "../../components/WateringIntervalSelector";
 import GenerateData from "../../components/GenerateData";
+import Link from "next/link";
+
 
 const getImageUrlFromPlant = (plant) => {
   switch (plant) {
@@ -106,7 +108,7 @@ function Dashboard({ auth }) {
   };
 
   return (
-    <AuthenticatedLayout>
+    <div>
       <div className="app-container relative w-full h-screen overflow-hidden">
         <div className={`step absolute w-full h-full transition-transform duration-300 ease-in-out ${step === 1 ? "translate-x-0" : "translate-x-full"}`}>
           {step === 1 && <ImageSelector onNext={handleNext} />}
@@ -174,7 +176,7 @@ function Dashboard({ auth }) {
           )}
         </div>
       </div>
-    </AuthenticatedLayout>
+    </div>
   );
 }
 
