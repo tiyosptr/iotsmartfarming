@@ -1,95 +1,131 @@
-"use client"
-import { useEffect } from 'react';
+"use client";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import GuestLayout from "../../Layouts/GuestLayout";
 import InputError from "../../../components/InputError";
 import InputLabel from "../../../components/InputLabel";
 import PrimaryButton from "../../../components/PrimaryButton";
 import TextInput from "../../../components/TextInput";
 import Link from 'next/link';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
+import FirebaseConfig from '@/components/FirebaseConfig/FirebaseConfig';
+import { hash } from 'bcryptjs';
+
 export default function Register() {
-    return (
-        <GuestLayout>
+  const router = useRouter();
+  const auth = FirebaseConfig().auth;
+  const firestore = FirebaseConfig().firestore;
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [passwordConfirmation, setPasswordConfirmation] = useState('');
+  const [name, setName] = useState('');
+  const [errors, setErrors] = useState({});
+  const [message, setMessage] = useState('');
 
-            <form >
-                <div>
-                    <InputLabel htmlFor="name" value="Name" />
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-                    <TextInput
-                        id="name"
-                        name="name"
-                       // value={data.name}
-                        className="mt-1 block w-full"
-                        //autoComplete="name"
-                        //isFocused={true}
-                        //onChange={(e) => setData('name', e.target.value)}
-                        //required
-                    />
+    if (password !== passwordConfirmation) {
+      setErrors({ passwordConfirmation: "Passwords do not match" });
+      return;
+    }
 
-                
-                </div>
+    try {
+      // Hash the password
+      const hashedPassword = await hash(password, 10); // Adjust the salt rounds as needed
 
-                <div className="mt-4">
-                    <InputLabel htmlFor="email" value="Email" />
+      // Create user in Firebase Authentication
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
 
-                    <TextInput
-                        id="email"
-                        type="email"
-                        name="email"
-                       // value={data.email}
-                        className="mt-1 block w-full"
-                        //autoComplete="username"
-                        //onChange={(e) => setData('email', e.target.value)}
-                        //required
-                    />
+      // Save additional user data to Firestore, including hashed password
+      const userDocRef =  doc(firestore, 'users', user.uid);
+      await setDoc(userDocRef, { 
+        email: user.email,
+        name: name,
+        password: hashedPassword  // Store the hashed password
+      });
+
+      setMessage('User registered successfully!');
+      // Redirect or show success message
+      router.push('/dashboard'); // Redirect to homepage or login page
+    } catch (error) {
+      setErrors({ general: error.message });
+    }
+  };
 
 
-                </div>
+  return (
+    <GuestLayout>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <InputLabel htmlFor="name" value="Name" />
+          <TextInput
+            name="name"
+            value={name}
+            className="mt-1 block w-full"
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+          {errors.name && <InputError message={errors.name} />}
+        </div>
 
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
+        <div className="mt-4">
+          <InputLabel htmlFor="email" value="Email" />
+          <TextInput
+            type="email"
+            name="email"
+            value={email}
+            className="mt-1 block w-full"
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          {errors.email && <InputError message={errors.email} />}
+        </div>
 
-                    <TextInput
-                        id="password"
-                        type="password"
-                        name="password"
-                      //  value={data.password}
-                        className="mt-1 block w-full"
-                       // autoComplete="new-password"
-                        //onChange={(e) => setData('password', e.target.value)}
-                        //required
-                    />
+        <div className="mt-4">
+          <InputLabel htmlFor="password" value="Password" />
+          <TextInput
+            type="password"
+            name="password"
+            value={password}
+            className="mt-1 block w-full"
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          {errors.password && <InputError message={errors.password} />}
+        </div>
 
-                </div>
+        <div className="mt-4">
+          <InputLabel htmlFor="password_confirmation" value="Confirm Password" />
+          <TextInput
+            type="password"
+            name="password_confirmation"
+            value={passwordConfirmation}
+            className="mt-1 block w-full"
+            onChange={(e) => setPasswordConfirmation(e.target.value)}
+            required
+          />
+          {errors.passwordConfirmation && <InputError message={errors.passwordConfirmation} />}
+        </div>
 
-                <div className="mt-4">
-                    <InputLabel htmlFor="password_confirmation" value="Confirm Password" />
+        {errors.general && <InputError message={errors.general} />}
 
-                    <TextInput
-                        id="password_confirmation"
-                        type="password"
-                        name="password_confirmation"
-                      //  value={data.password_confirmation}
-                        className="mt-1 block w-full"
-                       // autoComplete="new-password"
-                        //onChange={(e) => setData('password_confirmation', e.target.value)}
-                        //required
-                    />
+        <div className="flex items-center justify-end mt-4">
+          <Link
+            href=""
+            className="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            Already registered?
+          </Link>
+          <PrimaryButton type="submit" className="ms-4">
+            Register
+          </PrimaryButton>
+        </div>
 
-                </div>
-
-                <div className="flex items-center justify-end mt-4">
-                    <Link
-                        href=""
-                        className="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                    >
-                        Already registered?
-                    </Link>
-
-                    <PrimaryButton className="ms-4" >
-                        Register
-                    </PrimaryButton>
-                </div>
-            </form>
-        </GuestLayout>
-    );
+        {message && <p className="mt-4 text-green-600">{message}</p>}
+      </form>
+    </GuestLayout>
+  );
 }
