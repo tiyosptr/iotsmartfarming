@@ -5,9 +5,10 @@ import { useRouter } from 'next/navigation';
 import React, { useState, useEffect } from "react";
 import { onAuthStateChanged, getAuth, signOut } from 'firebase/auth';
 import FirebaseConfig from "@/components/FirebaseConfig/FirebaseConfig";
+import { doc, setDoc, getDoc, addDoc, collection, query, where, getDocs, onSnapshot, updateDoc } from 'firebase/firestore';
 
-// Modal Component
-const Modal = ({ isOpen, onClose, data }) => {
+// Detail Modal Component
+const DetailModal = ({ isOpen, onClose, data }) => {
   if (!isOpen) return null;
 
   return (
@@ -31,40 +32,48 @@ const Modal = ({ isOpen, onClose, data }) => {
   );
 };
 
+// Confirmation Modal Component
+const ConfirmationModal = ({ isOpen, onClose, onConfirm, status }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white w-96 p-4 rounded-md shadow-md">
+        <h2 className="text-lg font-semibold mb-2">Konfirmasi</h2>
+        <p className="text-gray-600 mb-4">Apakah Anda yakin mengubah status menjadi {status}?</p>
+        <button
+          onClick={onConfirm}
+          className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-md mr-2"
+        >
+          Ya
+        </button>
+        <button
+          onClick={onClose}
+          className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-md"
+        >
+          Tidak
+        </button>
+      </div>
+    </div>
+  );
+};
+
 export default function Pendaftaran() {
   const [user, setUser] = useState(null);
-  const [modalOpen, setModalOpen] = useState(false); // State untuk mengontrol modal
-  const [selectedData, setSelectedData] = useState(null); // State untuk menyimpan data yang dipilih
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
+  const [selectedData, setSelectedData] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState('');
+  const [pengajuanData, setPengajuanData] = useState([]);
   const auth = FirebaseConfig().auth;
+  const firestore = FirebaseConfig().firestore;
   const router = useRouter();
-
-  // Data contoh pengajuan alat
-  const pengajuanData = [
-    {
-      id: 1,
-      nama: "Contoh Nama 1",
-      email: "contoh1@example.com",
-      tanaman: "Padi",
-      ukuran: "10x10 meter",
-      jumlahBaris: 5,
-      tanamanPerBaris: "Jagung",
-    },
-    {
-      id: 2,
-      nama: "Contoh Nama 2",
-      email: "contoh2@example.com",
-      tanaman: "Jagung",
-      ukuran: "8x8 meter",
-      jumlahBaris: 4,
-      tanamanPerBaris: "Kacang Hijau",
-    },
-    // Tambahkan data lain sesuai kebutuhan
-  ];
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setUser(user);
+        fetchPengajuanData();
       } else {
         router.push('/auth/login'); // Redirect to login page if not authenticated
       }
@@ -72,6 +81,22 @@ export default function Pendaftaran() {
 
     return () => unsubscribe();
   }, []);
+
+  const fetchPengajuanData = async () => {
+    try {
+      const dataCollection = collection(firestore, 'pengajuanAlat'); // Replace with your collection name
+      const querySnapshot = await getDocs(dataCollection);
+      const items = [];
+      querySnapshot.forEach((doc) => {
+        items.push({ id: doc.id, ...doc.data() });
+      });
+      setPengajuanData(items);
+    } catch (error) {
+      console.error('Error fetching pengajuanAlat data:', error);
+      // Handle error
+    }
+  };
+  
 
   const handleLogout = async () => {
     try {
@@ -83,16 +108,58 @@ export default function Pendaftaran() {
     }
   };
 
-  // Fungsi untuk menampilkan modal dengan data yang dipilih
-  const openModal = (data) => {
-    setSelectedData(data);
-    setModalOpen(true);
+  const updateStatus = async (id, newStatus) => {
+    try {
+      const docRef = doc(firestore, 'pengajuanAlat', id);
+      await updateDoc(docRef, {
+        status: newStatus
+      });
+      // Fetch updated data
+      fetchPengajuanData();
+    } catch (error) {
+      console.error('Error updating status:', error);
+      // Handle error
+    }
   };
 
-  // Fungsi untuk menutup modal
-  const closeModal = () => {
+  const openDetailModal = (data) => {
+    setSelectedData(data);
+    setDetailModalOpen(true);
+  };
+
+  const closeDetailModal = () => {
     setSelectedData(null);
-    setModalOpen(false);
+    setDetailModalOpen(false);
+  };
+
+  const openConfirmationModal = (status) => {
+    setSelectedStatus(status);
+    setConfirmationModalOpen(true);
+  };
+
+  const closeConfirmationModal = () => {
+    setSelectedStatus('');
+    setConfirmationModalOpen(false);
+  };
+
+  const confirmStatusChange = () => {
+    if (selectedData) {
+      updateStatus(selectedData.id, selectedStatus);
+    }
+    closeConfirmationModal();
+  };
+
+  const getStatusButtonClass = (status) => {
+    if (status === 'Pengajuan Alat Selesai') {
+      return 'bg-green-500 ';
+    } if (status === 'Tidak Di setujui') {
+      return 'bg-red-500 '
+    }   if (status === 'Menunggu Persetujuan Admin') {
+      return 'bg-blue-500 '
+    }  
+    else {
+      return 'bg-yellow-500 ';
+    } 
   };
 
   return (
@@ -136,14 +203,37 @@ export default function Pendaftaran() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {pengajuanData.map((item) => (
             <div key={item.id} className="bg-white rounded-md shadow-md p-4">
-              <h2 className="text-lg font-semibold mb-2">Nama: {item.nama}</h2>
-              <p className="text-gray-600 mb-2">Email: {item.email}</p>
-              <p className="text-gray-600 mb-2">Tanaman Terpilih: {item.tanaman}</p>
-              <p className="text-gray-600 mb-2">Ukuran Taman: {item.ukuran}</p>
-              <p className="text-gray-600 mb-2">Jumlah Baris: {item.jumlahBaris}</p>
-              <p className="text-gray-600 mb-2">Tanaman Per Baris: {item.tanamanPerBaris}</p>
+              <h2 className="text-lg font-semibold mb-2">Email: {item.email}</h2>
+              <p className="text-gray-600 mb-2">Nama Alat: {item.namaAlat}</p>
+              <p className="text-gray-600 mb-2">Alamat Kebun: {item.alamatKebun}</p>
+              <p className="text-gray-600 mb-2">User Id: {item.userId}</p>
+              <p className="text-gray-600 mb-2">No Telepon: {item.noTelepon}</p>
+              <p className="text-gray-600 mb-2">Jumlah Alat: {item.jumlahAlat}</p>
+              <p className="text-gray-600 mb-2">Total Harga: {item.totalHarga}</p>
+              <div className="flex items-center mb-2">
+                <p className="text-gray-600 mr-2">Status:</p>
+                <p className={`text-white py-2 px-4 rounded-md ${getStatusButtonClass(item.status)}`}>{item.status}</p>
+              </div>
               <button
-                onClick={() => openModal(item)}
+                onClick={() => { setSelectedData(item); openConfirmationModal('Di Setujui dan Sedang Di proses'); }}
+                className="mt-4 bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-md"
+              >
+                Setujui
+              </button>
+              <button
+                onClick={() => { setSelectedData(item); openConfirmationModal('Pengajuan Alat Selesai'); }}
+                className="mt-4 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-md"
+              >
+                Pengajuan Alat Selesai
+              </button>
+              <button
+                onClick={() => { setSelectedData(item); openConfirmationModal('Tidak Di setujui'); }}
+                className="mt-4 bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-md"
+              >
+                Tidak Di setujui
+              </button>
+              <button
+                onClick={() => openDetailModal(item)}
                 className="mt-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md"
               >
                 Lihat Selengkapnya
@@ -152,9 +242,14 @@ export default function Pendaftaran() {
           ))}
         </div>
 
-        {/* Modal */}
-        <Modal isOpen={modalOpen} onClose={closeModal} data={selectedData} />
-
+        {/* Modals */}
+        <DetailModal isOpen={detailModalOpen} onClose={closeDetailModal} data={selectedData} />
+        <ConfirmationModal
+          isOpen={confirmationModalOpen}
+          onClose={closeConfirmationModal}
+          onConfirm={confirmStatusChange}
+          status={selectedStatus}
+        />
       </main>
     </div>
   );
