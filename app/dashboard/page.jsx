@@ -11,6 +11,7 @@ import { doc, setDoc, getDoc, addDoc, collection, query, where, getDocs, onSnaps
 import FirebaseConfig from "@/components/FirebaseConfig/FirebaseConfig";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import Header from "@/components/header";
 
 const getImageUrlFromPlant = (plant) => {
     switch (plant) {
@@ -86,15 +87,15 @@ function Dashboard() {
         };
     }, [auth, firestore, router]);
 
-    const handleLogout = async () => {
-        try {
-            await signOut(auth);
-            router.push('/auth/login'); // Redirect to login page after logout
-        } catch (error) {
-            console.error('Failed to log out', error);
-            // Handle logout error
-        }
-    };
+    // const handleLogout = async () => {
+    //     try {
+    //         await signOut(auth);
+    //         router.push('/auth/login'); // Redirect to login page after logout
+    //     } catch (error) {
+    //         console.error('Failed to log out', error);
+    //         // Handle logout error
+    //     }
+    // };
 
     const handleNext = (data) => {
         if (dataGenerated) return;
@@ -121,14 +122,13 @@ function Dashboard() {
         if (dataGenerated) return;
         setStep(step - 1);
     };
-
-    const handleGenerate = (data) => {
-        setPlantsPerRow(data);
-        generateData();
+    const handleGenerate = (plantsPerRow) => {
+        setPlantsPerRow(plantsPerRow); // Pastikan plantsPerRow diatur
+        generateData(selectedPlant, selectedSize, selectedRowCount, plantsPerRow); // Panggil generateData dengan nilai yang diperlukan
         setStep(5);
     };
-
-    const generateData = async () => {
+    
+    const generateData = (selectedPlant, selectedSize, selectedRowCount, plantsPerRow) => {
         const data = {
             selectedPlant,
             selectedSize,
@@ -137,15 +137,8 @@ function Dashboard() {
         };
         setGeneratedData(data);
         setDataGenerated(true);
-
-        if (user) {
-            const userDocRef = doc(firestore, "users", user.uid);
-            await setDoc(userDocRef, {
-                generatedData: data,
-            }, { merge: true });
-        }
     };
-
+    
     const handleSubmitModal = async () => {
         // Hitung total harga berdasarkan jumlah alat
         let hargaPerAlat = 50000; // Harga per alat
@@ -212,9 +205,10 @@ function Dashboard() {
 
     return (
         <div>
-            <button onClick={handleLogout} className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded">
+            {/* <button onClick={handleLogout} className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded">
                 Logout
-            </button>
+            </button> */}
+            <Header />
             <div className="app-container relative w-full h-screen overflow-hidden">
                 {!dataGenerated ? (
                     <div className="flex">

@@ -28,9 +28,10 @@ function GeneratedData({ data, imageUrl }) {
             <strong>Baris Kebun:</strong> {data.selectedRowCount} Baris
           </p>
           <p className="mt-2">
-            <strong>Jumlah Tanaman:</strong>{" "}
-            {data.selectedRowCount * data.plantsPerRow}
-          </p>
+  <strong>Jumlah Tanaman:</strong>{" "}
+  {data.selectedRowCount * data.plantsPerRow}
+</p>
+
         </div>
       </div>
       <div className="grid grid-cols-2 gap-5">
