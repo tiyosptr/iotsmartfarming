@@ -192,20 +192,20 @@ function Dashboard() {
             <div className="app-container relative w-full h-screen overflow-hidden">
                 {!dataGenerated ? (
                     <div className="flex">
-                        <motion.div className={`step w-full transition-transform duration-300 ease-in-out ${step === 1 ? "translate-x-0" : "translate-x-full"}`}>
+                        <motion.div className={`absolute step w-full transition-transform duration-700 ease-in-out ${step === 1 ? "translate-x-0" : "translate-x-full"}`}>
                             {step === 1 && <ImageSelector onNext={handleNext} />}
                         </motion.div>
-                        <motion.div className={`step w-full transition-transform duration-300 ease-in-out ${step === 2 ? "translate-x-0" : "translate-x-full"}`}>
+                        <motion.div className={`absolute step w-full transition-transform duration-700 ease-in-out ${step === 2 ? "translate-x-0" : "translate-x-full"}`}>
                             {step === 2 && (
                                 <GardenSizeSelector onNext={handleNext} onBack={handleBack} />
                             )}
                         </motion.div>
-                        <motion.div className={`step w-full transition-transform duration-300 ease-in-out ${step === 3 ? "translate-x-0" : "translate-x-full"}`}>
+                        <motion.div className={`absolute step w-full transition-transform duration-700 ease-in-out ${step === 3 ? "translate-x-0" : "translate-x-full"}`}>
                             {step === 3 && (
                                 <RowCountSelector onNext={handleNext} onBack={handleBack} />
                             )}
                         </motion.div>
-                        <motion.div className={`step w-full transition-transform duration-300 ease-in-out ${step === 4 ? "translate-x-0" : "translate-x-full"}`}>
+                        <motion.div className={`absolute step w-full transition-transform duration-700 ease-in-out ${step === 4 ? "translate-x-0" : "translate-x-full"}`}>
                             {step === 4 && (
                                 <RowPlantSelector onGenerate={handleGenerate} onBack={handleBack} />
                             )}
@@ -213,7 +213,7 @@ function Dashboard() {
                     </div>
                 ) : (
                     <div className="flex">
-                        <motion.div className={`step w-full transition-transform duration-300 ease-in-out ${step === 5 ? "translate-x-0" : "translate-x-full"}`}>
+                        <motion.div className={`absolute step w-full transition-transform duration-700 ease-in-out ${step === 5 ? "translate-x-0" : "translate-x-full"}`}>
                             {step === 5 && dataGenerated && (
                                 <GeneratedData data={generatedData} imageUrl={imageUrl} />
                             )}
