@@ -147,7 +147,7 @@ function GeneratedData({ data, imageUrl }) {
               <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
             </div>
 
-            <span className="hidden sm:inline-block sm:align-middle sm:h-screen"></span>&#8203;
+            <span className=" hidden sm:inline-block sm:align-middle sm:h-screen"></span>&#8203;
 
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
               <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -298,7 +298,8 @@ function GeneratedData({ data, imageUrl }) {
       {/* Daftar pengajuan alat */}
       <div className="mt-8 m-5">
         <h2 className="text-lg font-medium text-gray-900">Pengajuan Alat</h2>
-        <button onClick={() => setModalOpen(true)} className="bg-blue-500 hover:bg-red-600 text-white py-2 px-4 rounded">
+        <button onClick={() => setModalOpen(true)}  style={{ backgroundColor: "#D3F8C9" }}
+                  className="rounded-2xl py-2 px-7 text-black">
           Ajukan alat
         </button>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
