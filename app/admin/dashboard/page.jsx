@@ -80,7 +80,7 @@ export default function Home() {
             </li>
             <li>
               <a
-                href="admin/listpengajuan"
+                href="/admin/listpengajuan"
                 className="flex items-center p-2 text-white rounded-lg hover:bg-gray-900"
               >
                 <svg

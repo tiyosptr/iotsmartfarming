@@ -3,6 +3,9 @@ import React from "react";
 import Link from "next/link";
 import NavLink from "./NavLink";
 import ResponsiveNavLink from "./ResponsiveNavLink";
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import FirebaseConfig from "@/components/FirebaseConfig/FirebaseConfig";
+import { useRouter } from 'next/navigation';
 
 const handleLogout = async () => {
   try {
@@ -14,6 +17,19 @@ const handleLogout = async () => {
   }
 };
 const Header = () => {
+  const auth = FirebaseConfig().auth;
+  const firestore = FirebaseConfig().firestore;
+  const router = useRouter();
+  
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      router.push("/auth/login"); // Redirect to login page after logout
+    } catch (error) {
+      console.error("Failed to log out", error);
+      // Handle logout error
+    }
+  };
   return (
     <div>
       <nav

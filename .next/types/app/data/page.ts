@@ -1,4 +1,4 @@
-// File: D:\Semester 4\PBL\Aplikasi 3\iotsmartfarming\app\data\page.jsx
+// File: D:\Semester 4\PBL\Aplikasi 4\iotsmartfarming\app\data\page.jsx
 import * as entry from '../../../../app/data/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

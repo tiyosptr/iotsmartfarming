@@ -1,0 +1,116 @@
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import FirebaseConfig from "./FirebaseConfig/FirebaseConfig";
+import { collection, onSnapshot, orderBy, query, limit } from "firebase/firestore";
+
+function GeneratedData({ data, imageUrl }) {
+  const [latestSensorData, setLatestSensorData] = useState(null);
+  const [sensorData, setSensorData] = useState([]);
+  const firestore = FirebaseConfig().firestore;
+
+  useEffect(() => {
+    // Menggunakan onSnapshot untuk mendapatkan data sensor secara real-time
+    const unsubscribe = onSnapshot(
+      query(
+        collection(firestore, "sensor"),
+        orderBy("timestamp", "desc"),
+        limit(1) // Ambil hanya satu data terbaru
+      ),
+      (snapshot) => {
+        if (!snapshot.empty) {
+          const latestData = snapshot.docs[0].data();
+          setLatestSensorData(latestData);
+        }
+      }
+    );
+
+    return () => unsubscribe(); // Cleanup function untuk unsubscribe dari snapshot
+  }, [firestore]);
+
+  useEffect(() => {
+    // Mengambil semua data sensor untuk ditampilkan
+    const fetchData = async () => {
+      const querySnapshot = await collection(firestore, "sensor").get();
+      const data = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setSensorData(data);
+    };
+
+    fetchData();
+  }, [firestore]);
+
+  return (
+    <div className="flex flex-row items-start justify-center min-h-screen bg-white mt-20">
+      <div className="relative flex flex-col md:flex-row min-w-0 break-words bg-white shadow-xl border-white p-7 drop-shadow-md rounded-2xl mr-10">
+        <div className="w-40 h-40 rounded-full overflow-hidden flex items-center justify-center bg-gray-100 mb-4 md:mb-0 md:mr-7">
+          <img
+            id="displayed-image"
+            src={imageUrl}
+            alt="Selected Plant"
+            style={{
+              width: "200px",
+              height: "200px",
+              borderRadius: "50%",
+            }}
+          />
+        </div>
+        <div className="flex flex-col">
+          <p className="mt-4">
+            <strong>Tanaman:</strong> {data.selectedPlant}
+          </p>
+          <p className="mt-2">
+            <strong>Luas Kebun:</strong> {data.selectedSize} M
+          </p>
+          <p className="mt-2">
+            <strong>Baris Kebun:</strong> {data.selectedRowCount} Baris
+          </p>
+          <p className="mt-2">
+            <strong>Jumlah Tanaman:</strong> {data.selectedRowCount * data.plantsPerRow}
+          </p>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-5">
+        {/* Tampilan data sensor terbaru */}
+        {latestSensorData && (
+          <div className="relative flex flex-row items-center bg-white shadow-xl border-green-200 p-7 drop-shadow-md rounded-2xl">
+            <div className="flex flex-col justify-center">
+              <h2 className="font-medium text-center">Sensor Data {latestSensorData.id}</h2>
+              <p className="mt-2 text-center">Suhu: {latestSensorData.temperature || "Loading..."}°C</p>
+              <p className="mt-2 text-center">Kelembapan Tanah: {latestSensorData.soil_moisture || "Loading..."}</p>
+              <p className="mt-2 text-center">Kelembapan Udara: {latestSensorData.humidity || "Loading..."} RH</p>
+              <p className="mt-2 text-center">pH Tanah: {latestSensorData.soil_ph || "Loading..."}</p>
+              <p className="mt-2 text-center">Intensitas Cahaya: {latestSensorData.intensitas_cahaya || "Loading..."}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Tampilan semua data sensor */}
+        {sensorData.map((sensor, index) => (
+          <div key={index} className="relative flex flex-row items-center bg-white shadow-xl border-green-200 p-7 drop-shadow-md rounded-2xl">
+            <div className="flex flex-col justify-center">
+              <h2 className="font-medium text-center">Sensor Data {sensor.id}</h2>
+              <p className="mt-2 text-center">Suhu: {sensor.temperature || "Loading..."}°C</p>
+              <p className="mt-2 text-center">Kelembapan Tanah: {sensor.soil_moisture || "Loading..."}</p>
+              <p className="mt-2 text-center">Kelembapan Udara: {sensor.humidity || "Loading..."} RH</p>
+              <p className="mt-2 text-center">pH Tanah: {sensor.soil_ph || "Loading..."}</p>
+              <p className="mt-2 text-center">Intensitas Cahaya: {sensor.intensitas_cahaya || "Loading..."}</p>
+            </div>
+          </div>
+        ))}
+
+        {/* Link untuk navigasi */}
+        <div className="flex items-center justify-center">
+          <div
+            style={{ backgroundColor: "#D3F8C9" }}
+            className="rounded-2xl py-2 px-7 text-black"
+          >
+            <Link href="/data" className="text-black">
+              Lihat Perjam
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default GeneratedData;
