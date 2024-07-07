@@ -1,11 +1,19 @@
-
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import FirebaseConfig from "./FirebaseConfig/FirebaseConfig";
-import { collection, onSnapshot, orderBy, query, limit, addDoc, doc,where } from "firebase/firestore";
-import { useRouter } from 'next/navigation';
+import {
+  collection,
+  onSnapshot,
+  orderBy,
+  query,
+  limit,
+  addDoc,
+  doc,
+  where,
+} from "firebase/firestore";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { onAuthStateChanged, signOut } from "firebase/auth";
 
 function GeneratedData({ data, imageUrl }) {
   const [latestSensorData, setLatestSensorData] = useState(null);
@@ -14,10 +22,10 @@ function GeneratedData({ data, imageUrl }) {
   const [user, setUser] = useState(null);
   const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false); // State for modal visibility
-  const [namaAlat, setNamaAlat] = useState('');
-  const [alamatKebun, setAlamatKebun] = useState('');
-  const [noTelepon, setNoTelepon] = useState('');
-  const [jumlahAlat, setJumlahAlat] = useState('');
+  const [namaAlat, setNamaAlat] = useState("");
+  const [alamatKebun, setAlamatKebun] = useState("");
+  const [noTelepon, setNoTelepon] = useState("");
+  const [jumlahAlat, setJumlahAlat] = useState("");
   const [confirmationOpen, setConfirmationOpen] = useState(false); // State for confirmation modal
   const [submissions, setSubmissions] = useState([]);
   const [totalHargaAlat, setTotalHargaAlat] = useState(0);
@@ -50,10 +58,10 @@ function GeneratedData({ data, imageUrl }) {
         // Check if user has already generated data
         const userDocRef = doc(firestore, "users", user.uid);
         // Load equipment submissions
-        const submissionsRef = collection(firestore, 'pengajuanAlat');
-        const q = query(submissionsRef, where('userId', '==', user.uid));
+        const submissionsRef = collection(firestore, "pengajuanAlat");
+        const q = query(submissionsRef, where("userId", "==", user.uid));
         const unsubscribeSubmissions = onSnapshot(q, (snapshot) => {
-          const submissionsData = snapshot.docs.map(doc => ({
+          const submissionsData = snapshot.docs.map((doc) => ({
             id: doc.id,
             ...doc.data(),
           }));
@@ -63,7 +71,7 @@ function GeneratedData({ data, imageUrl }) {
 
         return () => unsubscribeSubmissions();
       } else {
-        router.push('/auth/login'); // Redirect to login page if not authenticated
+        router.push("/auth/login"); // Redirect to login page if not authenticated
       }
     });
 
@@ -71,7 +79,6 @@ function GeneratedData({ data, imageUrl }) {
       unsubscribeAuth();
     };
   }, [auth, firestore, router]);
-
 
   const handleSubmitModal = async () => {
     // Hitung total harga berdasarkan jumlah alat
@@ -87,14 +94,14 @@ function GeneratedData({ data, imageUrl }) {
       jumlahAlat,
       totalHarga, // Simpan total harga di Firestore
       userId: user.uid,
-      status: 'Pending' // Contoh status
+      status: "Pending", // Contoh status
     };
 
     try {
       // Tampilkan konfirmasi sebelum pengajuan
       setConfirmationOpen(true);
     } catch (e) {
-      console.error('Error adding document: ', e);
+      console.error("Error adding document: ", e);
     }
   };
 
@@ -113,12 +120,15 @@ function GeneratedData({ data, imageUrl }) {
       totalHarga, // Simpan total harga di Firestore
       userId: user.uid,
       email: user.email,
-      status: 'Menunggu Persetujuan Admin' // Contoh status
+      status: "Menunggu Persetujuan Admin", // Contoh status
     };
 
     try {
-      const docRef = await addDoc(collection(firestore, 'pengajuanAlat'), submissionData);
-      console.log('Document written with ID: ', docRef.id);
+      const docRef = await addDoc(
+        collection(firestore, "pengajuanAlat"),
+        submissionData
+      );
+      console.log("Document written with ID: ", docRef.id);
 
       // Update local state immediately after adding the document
       setSubmissions([...submissions, { id: docRef.id, ...submissionData }]);
@@ -127,22 +137,142 @@ function GeneratedData({ data, imageUrl }) {
       // Tambahkan logika untuk menutup modal dan membersihkan state
       setModalOpen(false);
       setConfirmationOpen(false);
-      setNamaAlat('');
-      setAlamatKebun('');
-      setNoTelepon('');
-      setJumlahAlat('');
+      setNamaAlat("");
+      setAlamatKebun("");
+      setNoTelepon("");
+      setJumlahAlat("");
     } catch (e) {
-      console.error('Error adding document: ', e);
+      console.error("Error adding document: ", e);
     }
   };
 
-
   return (
     <>
-      {/* Modal untuk pengajuan alat */}
-      {modalOpen && (
+    
+    <div className="flex flex-row items-start justify-center min-h-screen bg-white mt-20">
+        <div className="relative flex flex-col md:flex-row min-w-0 break-words bg-white shadow-xl border-white p-7 drop-shadow-md rounded-2xl mr-10">
+          <div className="w-40 h-40 rounded-full overflow-hidden flex items-center justify-center bg-gray-100 mb-4 md:mb-0 md:mr-7">
+            <img
+              id="displayed-image"
+              src={imageUrl}
+              alt="Selected Plant"
+              style={{
+                width: "200px",
+                height: "200px",
+                borderRadius: "50%",
+              }}
+            />
+          </div>
+          <div className="flex flex-col">
+            <p className="mt-4">
+              <strong>Tanaman:</strong> {data.selectedPlant}
+            </p>
+            <p className="mt-2">
+              <strong>Luas Kebun:</strong> {data.selectedSize} M
+            </p>
+            <p className="mt-2">
+              <strong>Baris Kebun:</strong> {data.selectedRowCount} Baris
+            </p>
+            <p className="mt-2">
+              <strong>Jumlah Tanaman:</strong>{" "}
+              {data.selectedRowCount * data.plantsPerRow}
+            </p>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-5">
+          {latestSensorData ? (
+            <>
+              <div className="relative flex flex-row items-center bg-white shadow-xl border-green-200 p-7 drop-shadow-md rounded-2xl">
+                <div className="flex flex-col justify-center">
+                  <h2 className="font-medium text-center">Suhu</h2>
+                  <p className="mt-2 text-center">
+                    {latestSensorData.temperature}°C
+                  </p>
+                </div>
+                <div className="flex justify-center ml-5">
+                  <img src="img/suhu.png" className="w-20 h-20" />
+                </div>
+              </div>
+              <div className="relative flex flex-row items-center bg-white shadow-xl border-green-200 p-7 drop-shadow-md rounded-2xl">
+                <div className="flex flex-col justify-center">
+                  <h2 className="font-medium text-center">Kelembapan Tanah</h2>
+                  <p className="mt-2 text-center">
+                    {latestSensorData.soil_moisture}
+                  </p>
+                </div>
+                <div className="flex justify-center ml-4">
+                  <img src="img/kelembapan tanah.png" className="w-20 h-20" />
+                </div>
+              </div>
+              <div className="relative flex flex-row items-center bg-white shadow-xl border-green-200 p-7 drop-shadow-md rounded-2xl">
+                <div className="flex flex-col justify-center">
+                  <h2 className="font-medium text-center">Kelembapan Udara</h2>
+                  <p className="mt-2 text-center">{latestSensorData.humidity} RH</p>
+                </div>
+                <div className="flex justify-center ml-4">
+                  <img src="img/kelembapan udara.png" className="w-20 h-20" />
+                </div>
+              </div>
+
+              <div className="relative flex flex-row items-center bg-white shadow-xl border-green-200 p-7 drop-shadow-md rounded-2xl">
+                <div className="flex flex-col justify-center">
+                  <h2 className="font-medium text-center">Intensitas Cahaya</h2>
+                  <p className="mt-2 text-center">{latestSensorData.intensitas_cahaya}</p>
+                </div>
+                <div className="flex justify-center ml-4">
+                  <img src="img/intensitas cahaya.png" className="w-20 h-20" />
+                </div>
+              </div>
+              
+              <div className="flex items-center ">
+                <div
+                  style={{ backgroundColor: "#D3F8C9" }}
+                  className="rounded-2xl py-2 px-7 text-black"
+                >
+                  <Link href="/data" className="text-black">
+                    Lihat Perjam
+                  </Link>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div>Loading...</div>
+          )}
+        </div>
+      </div>
+
+
+      {/* Daftar pengajuan alat */}
+      <div className=" m-5">
+        <h2 className="text-lg font-medium text-gray-900">Pengajuan Alat</h2>
+        <button onClick={() => setModalOpen(true)}  style={{ backgroundColor: "#D3F8C9" }}
+                  className="rounded-2xl py-2 px-7 text-black">
+          Ajukan alat
+        </button>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-8">
+          {submissions.map((submission) => (
+            <div key={submission.id} className="bg-white rounded-md shadow-md p-4">
+              <h2 className="text-lg font-semibold mb-2">Nama Alat: {submission.namaAlat}</h2>
+              <p className="text-gray-600 mb-2">Alamat Kebun: {submission.alamatKebun}</p>
+              <p className="text-gray-600 mb-2">No Telepon : {submission.noTelepon}</p>
+              <p className="text-gray-600 mb-2">Jumlah Alat : {submission.jumlahAlat}</p>
+              <p className="text-gray-600 mb-2">Total Harga Alat : Rp {submission.totalHarga}</p>
+              <p className="text-gray-600 mb-2">Status : {submission.status}</p>
+              {/* <button
+                onClick={() => openModal(item)}
+                className="mt-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md"
+              >
+                Lihat Selengkapnya
+              </button> */}
+            </div>
+          ))}
+        </div>
+      </div>
+
+        {/* Modal untuk pengajuan alat */}
+        {modalOpen && (
         <div className="fixed z-10 inset-0 overflow-y-auto">
-          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+          <div className="flex items-end justify-center min-h-screen mt-96 pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div className="fixed inset-0 transition-opacity">
               <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
             </div>
@@ -248,10 +378,9 @@ function GeneratedData({ data, imageUrl }) {
           </div>
         </div>
       )}
-
       {/* Modal konfirmasi pengajuan */}
       {confirmationOpen && (
-        <div className="fixed z-10 inset-0 overflow-y-auto">
+        <div className="fixed z-10 mt-96 inset-0 overflow-y-auto">
           <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div className="fixed inset-0 transition-opacity">
               <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
@@ -295,132 +424,6 @@ function GeneratedData({ data, imageUrl }) {
         </div>
       )}
 
-      {/* Daftar pengajuan alat */}
-      <div className="mt-8 m-5">
-        <h2 className="text-lg font-medium text-gray-900">Pengajuan Alat</h2>
-        <button onClick={() => setModalOpen(true)}  style={{ backgroundColor: "#D3F8C9" }}
-                  className="rounded-2xl py-2 px-7 text-black">
-          Ajukan alat
-        </button>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {submissions.map((submission) => (
-            <div key={submission.id} className="bg-white rounded-md shadow-md p-4">
-              <h2 className="text-lg font-semibold mb-2">Nama Alat: {submission.namaAlat}</h2>
-              <p className="text-gray-600 mb-2">Alamat Kebun: {submission.alamatKebun}</p>
-              <p className="text-gray-600 mb-2">No Telepon : {submission.noTelepon}</p>
-              <p className="text-gray-600 mb-2">Jumlah Alat : {submission.jumlahAlat}</p>
-              <p className="text-gray-600 mb-2">Total Harga Alat : Rp {submission.totalHarga}</p>
-              <p className="text-gray-600 mb-2">Status : {submission.status}</p>
-              <button
-                onClick={() => openModal(item)}
-                className="mt-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md"
-              >
-                Lihat Selengkapnya
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="flex flex-row items-start justify-center min-h-screen bg-white mt-20">
-        <div className="relative flex flex-col md:flex-row min-w-0 break-words bg-white shadow-xl border-white p-7 drop-shadow-md rounded-2xl mr-10">
-          <div className="w-40 h-40 rounded-full overflow-hidden flex items-center justify-center bg-gray-100 mb-4 md:mb-0 md:mr-7">
-            <img
-              id="displayed-image"
-              src={imageUrl}
-              alt="Selected Plant"
-              style={{
-                width: "200px",
-                height: "200px",
-                borderRadius: "50%",
-              }}
-            />
-          </div>
-          <div className="flex flex-col">
-            <p className="mt-4">
-              <strong>Tanaman:</strong> {data.selectedPlant}
-            </p>
-            <p className="mt-2">
-              <strong>Luas Kebun:</strong> {data.selectedSize} M
-            </p>
-            <p className="mt-2">
-              <strong>Baris Kebun:</strong> {data.selectedRowCount} Baris
-            </p>
-            <p className="mt-2">
-              <strong>Jumlah Tanaman:</strong>{" "}
-              {data.selectedRowCount * data.plantsPerRow}
-            </p>
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-5">
-          {latestSensorData ? (
-            <>
-              <div className="relative flex flex-row items-center bg-white shadow-xl border-green-200 p-7 drop-shadow-md rounded-2xl">
-                <div className="flex flex-col justify-center">
-                  <h2 className="font-medium text-center">Suhu</h2>
-                  <p className="mt-2 text-center">
-                    {latestSensorData.temperature}°C
-                  </p>
-                </div>
-                <div className="flex justify-center ml-5">
-                  <img src="img/suhu.png" className="w-20 h-20" />
-                </div>
-              </div>
-              <div className="relative flex flex-row items-center bg-white shadow-xl border-green-200 p-7 drop-shadow-md rounded-2xl">
-                <div className="flex flex-col justify-center">
-                  <h2 className="font-medium text-center">Kelembapan Tanah</h2>
-                  <p className="mt-2 text-center">
-                    {latestSensorData.soil_moisture}
-                  </p>
-                </div>
-                <div className="flex justify-center ml-4">
-                  <img src="img/kelembapan tanah.png" className="w-20 h-20" />
-                </div>
-              </div>
-              <div className="relative flex flex-row items-center bg-white shadow-xl border-green-200 p-7 drop-shadow-md rounded-2xl">
-                <div className="flex flex-col justify-center">
-                  <h2 className="font-medium text-center">Kelembapan Udara</h2>
-                  <p className="mt-2 text-center">{latestSensorData.humidity} RH</p>
-                </div>
-                <div className="flex justify-center ml-4">
-                  <img src="img/kelembapan udara.png" className="w-20 h-20" />
-                </div>
-              </div>
-
-              <div className="relative flex flex-row items-center bg-white shadow-xl border-green-200 p-7 drop-shadow-md rounded-2xl">
-                <div className="flex flex-col justify-center">
-                  <h2 className="font-medium text-center">Intensitas Cahaya</h2>
-                  <p className="mt-2 text-center">{latestSensorData.intensitas_cahaya}</p>
-                </div>
-                <div className="flex justify-center ml-4">
-                  <img src="img/intensitas cahaya.png" className="w-20 h-20" />
-                </div>
-              </div>
-              <div className="relative flex flex-row items-center bg-white shadow-xl border-green-200 p-7 drop-shadow-md rounded-2xl">
-                <div className="flex flex-col justify-center">
-                  <h2 className="font-medium text-center">Jumlah air pertanaman</h2>
-                  <p className="mt-2 text-center">02</p>
-                </div>
-                <div className="flex justify-center ml-4">
-                  <img src="img/intensitas cahaya.png" className="w-20 h-20" />
-                </div>
-              </div>
-              <div className="flex items-center justify-center">
-                <div
-                  style={{ backgroundColor: "#D3F8C9" }}
-                  className="rounded-2xl py-2 px-7 text-black"
-                >
-                  <Link href="/data" className="text-black">
-                    Lihat Perjam
-                  </Link>
-                </div>
-              </div>
-            </>
-          ) : (
-            <div>Loading...</div>
-          )}
-        </div>
-      </div>
     </>
   );
 }
