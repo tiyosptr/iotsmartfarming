@@ -189,7 +189,7 @@ function Dashboard() {
     return (
         <div>
             <Header />
-            <div className="app-container relative w-full h-screen overflow-hidden">
+            <div className="app-container relative">
                 {!dataGenerated ? (
                     <div className="flex">
                         <motion.div className={`absolute step w-full transition-transform duration-700 ease-in-out ${step === 1 ? "translate-x-0" : "translate-x-full"}`}>
