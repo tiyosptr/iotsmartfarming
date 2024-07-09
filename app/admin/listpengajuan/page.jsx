@@ -174,7 +174,7 @@ export default function Pendaftaran() {
           <ul className="space-y-2 font-medium">
             <li>
               <a
-                href="#"
+                href="/admin/dashboard"
                 className="flex items-center p-2 text-white rounded-lg hover:bg-gray-900"
               >
                 <svg
@@ -243,6 +243,7 @@ export default function Pendaftaran() {
         <h1 className="text-2xl font-bold mb-5">Pengajuan Alat</h1>
 
         {/* Cards */}
+        <div className="sm:ml-60">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {pengajuanData.map((item) => (
             <div key={item.id} className="bg-white rounded-md shadow-md p-4">
@@ -283,6 +284,7 @@ export default function Pendaftaran() {
               </button>
             </div>
           ))}
+        </div>
         </div>
 
         {/* Modals */}

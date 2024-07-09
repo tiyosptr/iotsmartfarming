@@ -1,39 +1,61 @@
 "use client"
 import Head from "next/head";
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import FirebaseConfig from "@/components/FirebaseConfig/FirebaseConfig";
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot,query, where } from "firebase/firestore";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 export default function Page() {
   const [sensorData, setSensorData] = useState([]);
+  const [user, setUser] = useState(null);
   const firestore = FirebaseConfig().firestore;
+  const auth = getAuth();
+  const router = useRouter()
+  useEffect(() => {
+    // Check if the user is authenticated
+    const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
+      if (!currentUser) {
+        // User is not authenticated, redirect to login page
+        router.push("/auth/login");
+      } else {
+        setUser(currentUser);
+      }
+    });
+
+    // Cleanup function for auth subscription
+    return () => unsubscribeAuth();
+  }, [auth, router]);
 
   useEffect(() => {
     // Menggunakan onSnapshot untuk mendapatkan data secara real-time
-    const unsubscribe = onSnapshot(collection(firestore, "sensor"), (snapshot) => {
-      const data = snapshot.docs.map((doc) => {
-        const sensorData = doc.data();
-        const timestamp = sensorData.timestamp
-          ? sensorData.timestamp.split(" ")
-          : ["Loading...", "Loading..."];
-        
-        const date = new Date(timestamp[0]);
-        const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-        const dayName = days[date.getUTCDay()];
-
-        return { id: doc.id, ...sensorData, day: dayName, time: timestamp[1] };
+    if (user) {
+      const q = query(collection(firestore, 'sensor'), where('id_user', '==', user.uid));
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        const data = snapshot.docs.map((doc) => {
+          const sensorData = doc.data();
+          const timestamp = sensorData.timestamp
+            ? sensorData.timestamp.split(' ')
+            : ['Loading...', 'Loading...'];
+          
+          const date = new Date(timestamp[0]);
+          const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+          const dayName = days[date.getUTCDay()];
+  
+          return { id: doc.id, ...sensorData, day: dayName, time: timestamp[1] };
+        });
+  
+        // Membalik urutan data menjadi terbaru di atas
+        data.reverse();
+        setSensorData(data);
       });
-
-      // Membalik urutan data menjadi terbaru di atas
-      data.reverse();
-      setSensorData(data);
-    });
-
-    // Cleanup function untuk unsubscribe dari snapshot
-    return () => unsubscribe();
-  }, [firestore]);
-
+  
+      // Cleanup function untuk unsubscribe dari snapshot
+      return () => unsubscribe();
+    }
+  }, [user, firestore]);
+  
   // Fungsi untuk menentukan kelas warna berdasarkan suhu
   const getSuhuColorClass = (temperature) => {
     if (temperature >= 38) {
@@ -76,7 +98,7 @@ export default function Page() {
                     <th className="px-6 py-3">Kelembapan Tanah</th>
                     <th className="px-6 py-3">Kelembapan Udara</th>
                     <th className="px-6 py-3">Intensitas Cahaya</th>
-                    <th className="px-6 py-3">Kebutuhan Air Tanaman</th>
+                    <th className="px-6 py-3">koordinat</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -92,7 +114,7 @@ export default function Page() {
                       <td className="px-6 py-4">{sensor.soil_moisture || "Loading..."}</td>
                       <td className="px-6 py-4">{sensor.humidity || "Loading..."} RH</td>
                       <td className="px-6 py-4">{sensor.intensitas_cahaya || "Loading..."}</td>
-                      <td className="px-6 py-4">0.2 liter/tanaman</td>
+                      <td className="px-6 py-4">{sensor.coordinate}</td>
                     </tr>
                   ))}
                 </tbody>

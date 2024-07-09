@@ -1,35 +1,42 @@
-// components/MyComponent.js
-import React from "react";
+"use client"
+import React, { useEffect } from "react";
 import Link from "next/link";
 import NavLink from "./NavLink";
 import ResponsiveNavLink from "./ResponsiveNavLink";
-import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import FirebaseConfig from "@/components/FirebaseConfig/FirebaseConfig";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 
-const handleLogout = async () => {
-  try {
-    await signOut(auth);
-    router.push("/auth/login"); // Redirect to login page after logout
-  } catch (error) {
-    console.error("Failed to log out", error);
-    // Handle logout error
-  }
-};
 const Header = () => {
   const auth = FirebaseConfig().auth;
-  const firestore = FirebaseConfig().firestore;
   const router = useRouter();
-  
+  let unsubscribeFirestore = null; // Variable untuk menyimpan unsubscribe function
+
   const handleLogout = async () => {
     try {
       await signOut(auth);
+      // Hentikan listener Firestore jika masih berjalan
+      if (unsubscribeFirestore) {
+        unsubscribeFirestore();
+        unsubscribeFirestore = null; // Reset variable unsubscribeFirestore
+      }
       router.push("/auth/login"); // Redirect to login page after logout
     } catch (error) {
       console.error("Failed to log out", error);
       // Handle logout error
     }
   };
+
+  // Menghentikan listener Firestore saat komponen unmount
+  useEffect(() => {
+    return () => {
+      if (unsubscribeFirestore) {
+        unsubscribeFirestore();
+        unsubscribeFirestore = null;
+      }
+    };
+  }, []);
+
   return (
     <div>
       <nav
@@ -42,11 +49,11 @@ const Header = () => {
               <div className="flex-shrink-0"></div>
             </div>
             <div className="space-x-5 text-white sm:-my-px sm:ml-5 sm:flex text-center">
-              <NavLink href="/dashboard"className="">Dashboard</NavLink>
-
+              <NavLink href="/dashboard" className="">
+                Dashboard
+              </NavLink>
               <NavLink href="/profile">Profile</NavLink>
             </div>
-
             <div>
               <button
                 onClick={handleLogout}

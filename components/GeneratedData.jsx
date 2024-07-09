@@ -18,6 +18,8 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 function GeneratedData({ data, imageUrl }) {
   const [latestSensorData, setLatestSensorData] = useState(null);
   const firestore = FirebaseConfig().firestore;
+  const [plantHealth, setPlantHealth] = useState("Loading...");
+  const [waterRequirement, setWaterRequirement] = useState(0);
   const auth = FirebaseConfig().auth;
   const [user, setUser] = useState(null);
   const router = useRouter();
@@ -44,6 +46,8 @@ function GeneratedData({ data, imageUrl }) {
         if (!snapshot.empty) {
           const latestData = snapshot.docs[0].data();
           setLatestSensorData(latestData);
+          predictPlantHealth(latestData);
+          calculateWaterRequirement(latestData);
         }
       }
     );
@@ -79,6 +83,83 @@ function GeneratedData({ data, imageUrl }) {
       unsubscribeAuth();
     };
   }, [auth, firestore, router]);
+
+
+  const predictPlantHealth = (sensorData) => {
+    let healthStatus = "Healthy";
+    const { temperature, soil_moisture, humidity, intensitas_cahaya } = sensorData;
+
+    if (temperature < 15 || temperature > 35) {
+      healthStatus = "Tidak sehat karena suhu ";
+    } else if (soil_moisture === "Dry" && intensitas_cahaya === "Gelap Gulita") {
+      healthStatus = "Tidak sehat karena kelembaban tanah dan intensitas cahaya";
+    } else if (humidity < 30 || humidity > 70) {
+      healthStatus = "Tidak sehat karena kelembapan";
+    }
+
+    setPlantHealth(healthStatus);
+  };
+
+  const calculateWaterRequirement = (sensorData) => {
+    const { temperature, soil_moisture, humidity, intensitas_cahaya } = sensorData;
+  
+    // Konstanta untuk faktor pengaruh
+    const temperatureFactor = 0.05; // Faktor pengaruh suhu
+    const humidityFactor = 0.03; // Faktor pengaruh kelembaban udara
+    const lightFactor = 0.02; // Faktor pengaruh intensitas cahaya
+    const soilMoistureFactorDry = 1.5; // Faktor pengaruh kekeringan tanah
+    const soilMoistureFactorWet = 0.5; // Faktor pengaruh kelembaban tanah
+  
+    let waterRequirement = 0;
+  
+    // Pengaruh suhu
+    if (temperature < 15) {
+      waterRequirement += temperatureFactor * 2;
+    } else if (temperature < 20) {
+      waterRequirement += temperatureFactor * 1.5;
+    } else if (temperature < 25) {
+      waterRequirement += temperatureFactor * 1;
+    } else if (temperature < 30) {
+      waterRequirement += temperatureFactor * 0.5;
+    } else {
+      waterRequirement += temperatureFactor * 0.2;
+    }
+  
+    // Pengaruh kelembaban udara
+    if (humidity < 30) {
+      waterRequirement += humidityFactor * 2;
+    } else if (humidity < 40) {
+      waterRequirement += humidityFactor * 1.5;
+    } else if (humidity < 50) {
+      waterRequirement += humidityFactor * 1;
+    } else if (humidity < 60) {
+      waterRequirement += humidityFactor * 0.5;
+    } else {
+      waterRequirement += humidityFactor * 0.2;
+    }
+  
+    // Pengaruh intensitas cahaya
+    if (intensitas_cahaya === 'Gelap Gulita') {
+      waterRequirement += lightFactor * 2;
+    }else if (intensitas_cahaya === 'Cerah') {
+      waterRequirement += lightFactor * 0.5;
+    } else {
+      waterRequirement += lightFactor * 0.2;
+    }
+  
+    // Pengaruh kelembaban tanah
+    if (soil_moisture === 'Dry') {
+      waterRequirement *= soilMoistureFactorDry;
+    } else if (soil_moisture === 'Basah') {
+      waterRequirement *= soilMoistureFactorWet;
+    }
+  
+    // Pembulatan kebutuhan air
+    waterRequirement = Math.round(waterRequirement * 10) / 10; // Bulatkan ke satu desimal
+  
+    setWaterRequirement(waterRequirement);
+  };
+  
 
   const handleSubmitModal = async () => {
     // Hitung total harga berdasarkan jumlah alat
@@ -146,10 +227,11 @@ function GeneratedData({ data, imageUrl }) {
     }
   };
 
+
   return (
     <>
-    
-    <div className="flex flex-row items-start justify-center min-h-screen bg-white mt-20">
+
+      <div className="flex flex-row items-start justify-center min-h-screen bg-white mt-20">
         <div className="relative flex flex-col md:flex-row min-w-0 break-words bg-white shadow-xl border-white p-7 drop-shadow-md rounded-2xl mr-10">
           <div className="w-40 h-40 rounded-full overflow-hidden flex items-center justify-center bg-gray-100 mb-4 md:mb-0 md:mr-7">
             <img
@@ -223,7 +305,18 @@ function GeneratedData({ data, imageUrl }) {
                   <img src="img/intensitas cahaya.png" className="w-20 h-20" />
                 </div>
               </div>
-              
+              <div className="relative flex flex-row items-center bg-white shadow-xl border-green-200 p-7 drop-shadow-md rounded-2xl">
+                <div className="flex flex-col justify-center">
+                  <h2 className="font-medium text-center">Kesehatan Tanaman</h2>
+                  <p className="mt-2 text-center">{plantHealth}</p>
+                </div>
+              </div>
+              <div className="relative flex flex-row items-center bg-white shadow-xl border-green-200 p-7 drop-shadow-md rounded-2xl">
+                <div className="flex flex-col justify-center">
+                  <h2 className="font-medium text-center">Kebutuhan Air per Tanaman</h2>
+                  <p className="mt-2 text-center">Jumlah kebutuhan air: {waterRequirement} liter</p>
+                </div>
+              </div>
               <div className="flex items-center ">
                 <div
                   style={{ backgroundColor: "#D3F8C9" }}
@@ -245,8 +338,8 @@ function GeneratedData({ data, imageUrl }) {
       {/* Daftar pengajuan alat */}
       <div className=" m-5">
         <h2 className="text-lg font-medium text-gray-900">Pengajuan Alat</h2>
-        <button onClick={() => setModalOpen(true)}  style={{ backgroundColor: "#D3F8C9" }}
-                  className="rounded-2xl py-2 px-7 text-black">
+        <button onClick={() => setModalOpen(true)} style={{ backgroundColor: "#D3F8C9" }}
+          className="rounded-2xl py-2 px-7 text-black">
           Ajukan alat
         </button>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-8">
@@ -269,8 +362,8 @@ function GeneratedData({ data, imageUrl }) {
         </div>
       </div>
 
-        {/* Modal untuk pengajuan alat */}
-        {modalOpen && (
+      {/* Modal untuk pengajuan alat */}
+      {modalOpen && (
         <div className="fixed z-10 inset-0 overflow-y-auto">
           <div className="flex items-end justify-center min-h-screen mt-96 pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div className="fixed inset-0 transition-opacity">
@@ -397,7 +490,7 @@ function GeneratedData({ data, imageUrl }) {
                     </h3>
                     <div className="mt-2">
                       <p className="text-sm text-gray-500">
-                        Apakah Anda yakin ingin mengajukan alat dengan nama <strong>{namaAlat}</strong>?
+                        Apakah Anda yakin ingin mengajukan alat?
                       </p>
                     </div>
                   </div>
