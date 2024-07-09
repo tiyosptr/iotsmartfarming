@@ -1,8 +1,7 @@
 {
+  "/admin/dashboard/page": "app/admin/dashboard/page.js",
   "/dashboard/page": "app/dashboard/page.js",
   "/auth/login/page": "app/auth/login/page.js",
-  "/admin/dashboard/page": "app/admin/dashboard/page.js",
-  "/data/page": "app/data/page.js",
   "/admin/listpengajuan/page": "app/admin/listpengajuan/page.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js"
+  "/data/page": "app/data/page.js"
 }
