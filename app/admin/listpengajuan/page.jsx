@@ -163,13 +163,17 @@ export default function Pendaftaran() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex bg-gray-100">
       {/* Sidebar */}
+     
       <aside
         id="default-sidebar"
         className="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0"
         aria-label="Sidebar"
       >
+         <div class="flex items-center justify-center h-16 bg-gray-900">
+            <span class="text-white font-bold uppercase">List Pengajuan Alat</span>
+        </div>
         <div className="h-full px-3 py-4 overflow-y-auto bg-gray-800">
           <ul className="space-y-2 font-medium">
             <li>
@@ -233,7 +237,7 @@ export default function Pendaftaran() {
 
 
       {/* Main Content */}
-      <main className="flex-1 p-10">
+      <main className="flex-1 p-10 ">
         <Head>
           <title>Pengajuan Alat</title>
           <meta name="description" content="Dashboard with sidebar menu" />
@@ -256,7 +260,7 @@ export default function Pendaftaran() {
               <p className="text-gray-600 mb-2">Total Harga: {item.totalHarga}</p>
               <div className="flex items-center mb-2">
                 <p className="text-gray-600 mr-2">Status:</p>
-                <p className={`text-white py-2 px-4 rounded-md ${getStatusButtonClass(item.status)}`}>{item.status}</p>
+                <p className={`text-white py-2 px-1 rounded-md ${getStatusButtonClass(item.status)}`}>{item.status}</p>
               </div>
               <button
                 onClick={() => { setSelectedData(item); openConfirmationModal('Di Setujui dan Sedang Di proses'); }}
@@ -266,7 +270,7 @@ export default function Pendaftaran() {
               </button>
               <button
                 onClick={() => { setSelectedData(item); openConfirmationModal('Pengajuan Alat Selesai'); }}
-                className="mt-4 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-md"
+                className="mt-4 bg-green-500  hover:bg-green-600 text-white py-2 px-4 rounded-md"
               >
                 Pengajuan Alat Selesai
               </button>
